@@ -1,12 +1,11 @@
 # MCP XMind Server
-[![smithery badge](https://smithery.ai/badge/@41px/mcp-xmind)](https://smithery.ai/server/@41px/mcp-xmind)
 
 A Model Context Protocol server for analyzing and querying XMind mind maps. This tool provides powerful capabilities for searching, extracting, and analyzing content from XMind files.
 
 ## Features
 
 - 🔍 Smart fuzzy search across mind maps
-- 📝 Task management and tracking
+- 📝 Task management and tracking (todo/done status)
 - 🌲 Hierarchical content navigation
 - 🔗 Link and reference extraction
 - 📊 Multi-file analysis
@@ -16,18 +15,19 @@ A Model Context Protocol server for analyzing and querying XMind mind maps. This
 
 ## Installation
 
-### Installing via Smithery
-
-To install XMind Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@41px/mcp-xmind):
+### Via npm (recommended)
 
 ```bash
-npx -y @smithery/cli install @41px/mcp-xmind --client claude
+npx @apeyroux/mcp-xmind /path/to/xmind/files
 ```
 
-### Manual Installation
+### From source
+
 ```bash
-npm install @modelcontextprotocol/sdk adm-zip zod
-npm install --save-dev typescript @types/node
+git clone https://github.com/apeyroux/mcp-xmind.git
+cd mcp-xmind
+npm install
+npm run build
 ```
 
 ## Usage
@@ -42,36 +42,35 @@ node dist/index.js <allowed-directory> [additional-directories...]
 
 1. **read_xmind**
    - Parse and analyze XMind files
-   - Extract complete mind map structure
+   - Extract complete mind map structure with relationships
 
-2. **get_todo_tasks**
-   - Extract and analyze TODO tasks
-   - Include task context and hierarchy
-
-3. **list_xmind_directory**
+2. **list_xmind_directory**
    - Recursively scan for XMind files
    - Filter and organize results
 
-4. **read_multiple_xmind_files**
+3. **read_multiple_xmind_files**
    - Process multiple files simultaneously
    - Compare and analyze across files
 
-5. **search_xmind_files**
+4. **search_xmind_files**
    - Search files by name patterns
+   - Search within file content
    - Recursive directory scanning
 
-6. **extract_node**
+5. **extract_node**
    - Smart fuzzy path matching
    - Ranked search results
    - Complete subtree extraction
 
-7. **extract_node_by_id**
+6. **extract_node_by_id**
    - Direct node access by ID
    - Fast and precise retrieval
 
-8. **search_nodes**
+7. **search_nodes**
    - Multi-criteria content search
-   - Configurable search fields
+   - Filter by task status (todo/done)
+   - Search in titles, notes, labels, callouts
+   - Case-sensitive/insensitive options
 
 ## Examples
 
@@ -88,7 +87,19 @@ node dist/index.js <allowed-directory> [additional-directories...]
 }
 ```
 
-### Extract Node
+### Find TODO Tasks
+```json
+{
+    "name": "search_nodes",
+    "arguments": {
+        "path": "/path/to/file.xmind",
+        "query": "",
+        "taskStatus": "todo"
+    }
+}
+```
+
+### Extract Node by Fuzzy Path
 ```json
 {
     "name": "extract_node",
@@ -99,47 +110,39 @@ node dist/index.js <allowed-directory> [additional-directories...]
 }
 ```
 
-### List Tasks
-```json
-{
-    "name": "get_todo_tasks",
-    "arguments": {
-        "path": "/path/to/file.xmind"
-    }
-}
-```
-
 ## Configuration
 
-### Development Configuration
+### Claude Desktop Configuration
 
-Example `claude_desktop_config.json` for development:
+Add to your `claude_desktop_config.json`:
 
 ```json
 {
-  "xmind": {
-    "command": "node",
-    "args": [
-      "/Users/alex/Src/mcp-xmind/dist/index.js",
-      "/Users/alex/XMind"
-    ]
+  "mcpServers": {
+    "xmind": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@apeyroux/mcp-xmind",
+        "/path/to/your/xmind/files"
+      ]
+    }
   }
 }
 ```
 
-### Production Configuration
-
-Example `claude_desktop_config.json` for production using npmjs:
+### Development Configuration
 
 ```json
 {
-  "xmind": {
-    "command": "npx",
-    "args": [
-      "-y",
-      "@41px/mcp-xmind",
-      "/Users/alex/XMind"
-    ]
+  "mcpServers": {
+    "xmind": {
+      "command": "node",
+      "args": [
+        "/path/to/mcp-xmind/dist/index.js",
+        "/path/to/your/xmind/files"
+      ]
+    }
   }
 }
 ```
@@ -157,13 +160,23 @@ Example `claude_desktop_config.json` for production using npmjs:
 npm run build
 ```
 
-### Type Checking
+### Running Tests
 ```bash
-npm run type-check
+npm test
+```
+
+### Watch Mode
+```bash
+npm run watch        # TypeScript compilation
+npm run test:watch   # Tests
 ```
 
 ### MCP Inspector
 
 ```bash
-npx @modelcontextprotocol/inspector node dist/index.js /Users/alex/XMind
+npx @modelcontextprotocol/inspector node dist/index.js /path/to/xmind/files
 ```
+
+## License
+
+MIT
