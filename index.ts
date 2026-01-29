@@ -21,18 +21,20 @@ const allowedDirectories = args.map(dir =>
 );
 
 // Validate that all directories exist and are accessible
-await Promise.all(args.map(async (dir) => {
-    try {
-        const stats = await fs.stat(dir);
-        if (!stats.isDirectory()) {
-            console.error(`Error: ${dir} is not a directory`);
+async function validateDirectories(): Promise<void> {
+    await Promise.all(args.map(async (dir) => {
+        try {
+            const stats = await fs.stat(dir);
+            if (!stats.isDirectory()) {
+                console.error(`Error: ${dir} is not a directory`);
+                process.exit(1);
+            }
+        } catch (error) {
+            console.error(`Error accessing directory ${dir}:`, error);
             process.exit(1);
         }
-    } catch (error) {
-        console.error(`Error accessing directory ${dir}:`, error);
-        process.exit(1);
-    }
-}));
+    }));
+}
 
 // Path validation helper
 function isPathAllowed(filePath: string): boolean {
@@ -1424,6 +1426,7 @@ IMPORTANT: When user mentions "planning", "schedule", "timeline", "Gantt", "proj
 
 // Start server
 async function runServer(): Promise<void> {
+    await validateDirectories();
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error("XMind Analysis Server running on stdio");

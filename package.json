@@ -8,7 +8,12 @@
     "url": "https://github.com/apeyroux/mcp-xmind"
   },
   "homepage": "https://github.com/apeyroux/mcp-xmind#readme",
-  "keywords": ["mcp", "xmind", "mindmap", "model-context-protocol"],
+  "keywords": [
+    "mcp",
+    "xmind",
+    "mindmap",
+    "model-context-protocol"
+  ],
   "license": "MIT",
   "author": "Alexandre Peyroux <alex@fmap.it>",
   "type": "module",
