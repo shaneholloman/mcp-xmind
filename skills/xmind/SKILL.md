@@ -110,6 +110,30 @@ When the user mentions "planning", "schedule", "timeline", "Gantt", "project", "
 | `rootTopic` | topic (required) | Root topic |
 | `relationships` | array | `{sourceTitle, targetTitle, title?}` — connects topics by title |
 
+## Working with large files
+
+When reading a PDF or other large file fails (e.g. "PDF too large"), extract text using CLI tools before building the mind map:
+
+```bash
+# Preferred: pdftotext (install: apt install poppler-utils)
+pdftotext input.pdf /tmp/extracted.txt
+
+# Fallback if pdftotext unavailable:
+python3 -c "
+import subprocess, pathlib, sys
+p = sys.argv[1]
+try:
+    subprocess.run(['pdftotext', p, '/tmp/extracted.txt'], check=True)
+except FileNotFoundError:
+    subprocess.run(['pip', 'install', 'pymupdf'], check=True, capture_output=True)
+    import importlib; fitz = importlib.import_module('fitz')
+    doc = fitz.open(p)
+    pathlib.Path('/tmp/extracted.txt').write_text('\n'.join(page.get_text() for page in doc))
+" input.pdf
+```
+
+Then read `/tmp/extracted.txt` to build the mind map.
+
 ## Important rules
 
 - The output path MUST end with `.xmind`
